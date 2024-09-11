@@ -27,7 +27,7 @@
             <h2>Approach</h2>
             <p>I implemented the basic methods for aligning images (the naive approach of using trial and error to find offsets between images) as well as an image-pyramid approach for larger files that first scales down the image to a base case slightly larger than 32 by 32 pixels, find the offset vector through trial and error, and recursively iterate through larger versions of the image (multiplying the scale by 2 as well as the previous displacement vector) to finally arrive at a displacement for the largest image.</p>
             <p> For a metric for how well aligned the images are, I used the L2 norm between the images and also implemented Normalized Cross-Correlation (NCC) for images that do not work well with the L2 norm comparison.</p>
-            <p> An extra feature I implemented that vastly improved the quality of the colorized image was using Canny edge detection to transform the images and align the images based off the transformed images. I expected NCC to work the best for these since they would compare edges directly, but actually the L2 norm turned out to work the best for the majority of photos in the dataset (probably because canny edge detection is a bit messy and sigma would need to be finetuned for each image for NCC to work well). I've also implemented parallel threading in my code to speed up the image generation process.</p>
+            <p> An extra feature I implemented that vastly improved the quality of the colorized image was using Canny edge detection to transform the images and align the images based off the transformed images. The Canny edge detector first applies a filter derived from a Gaussian function to smooth the image and reduce the influence of noise. Next, the intensity of the gradient at each pixel is calculated to find areas where intensity changes sharply. To refine the results, the algorithm trims down potential edges to single-pixel lines by discarding gradient magnitude values that are not local maxima. Lastly, it uses hysteresis thresholding to decide which remaining pixels truly form part of an edge based on their gradient strength. I expected NCC to work the best for these since they would compare edges directly, but actually the L2 norm turned out to work the best for the majority of photos in the dataset (probably because canny edge detection is a bit messy and sigma and the hysteresis thresholds would need to be finetuned for each image for NCC to work well). I've also implemented parallel threading in my code to speed up the image generation process from ~45 min for all photos to ~24 min for all photos.</p>
             <p>Images are separated by method, with a comparison of techniques at the bottom. The blue image was taken to be an offset of (0,0), and displacement vectors are listed as (vertical, horizontal) pointing down and to the right of the top left corner for positive displacements.</p>
             <p>Extra images I've chosen are marked with *asterisks*! </p>
         </section>
@@ -69,7 +69,7 @@
         </section>
         <section>
             <h2>Image-Pyramid Edge Detection L2 Norm</h2>
-            <p> Generated images are with an image-pyramid approach transformed using Canny edge detection with sigma=1.5 and sweeping over 50 pixel displacements per layer. Comparisons between layers are done using the L2 norm.</p>
+            <p> Generated images are with an image-pyramid approach transformed using Canny edge detection with sigma=1.5 and sweeping over 50 pixel displacements per layer. Comparisons between layers are done using the L2 norm. Lady required sigma=0 to be aligned properly, possibly due to the soft colors with lack of contrast making the gradients smaller and below the hysteresis threshold. </p>
 
             <div class="image-grid">
                 <figure>
@@ -127,6 +127,12 @@
                     <figcaption><b>r: </b>(84, 28) </figcaption>
                 </figure>
                 <figure>
+                    <figcaption><b>Lady (sigma=0)</b></figcaption>
+                    <img src="./media/lady.jpg" alt="lady.jpg">
+                    <figcaption><b>g: </b>(57, 9)</figcaption>
+                    <figcaption><b>r: </b>(120, 13) </figcaption>
+                </figure>
+                <figure>
                     <figcaption><b>*Lugano*</b></figcaption>
                     <img src="./media/lugano.jpg" alt="lugano.jpg">
                     <figcaption><b>g: </b>(41, -17)</figcaption>
@@ -148,13 +154,13 @@
         </section>
         <section>
             <h2>Image-Pyramid L2 Norm</h2>
-            <p> Image-pyramid approach sweeping over 50 pixel displacements per layer. Comparisons between layers are done using the L2 norm.</p>
+            <p> Image-pyramid approach sweeping over 50 pixel displacements per layer. Comparisons between layers are done using the L2 norm. Edge detections seems to have a hard time with aligning the melon image precisely (although it is within several pixels). After inspecting the Canny transformed images, I believe this is because there is a lot more blue contrast in the image to determine edges, and not as much green and red contrast. This makes it slightly more difficult to align green and red images precisely onto the blue. </p>
             <div class="image-grid">
                 <figure>
-                    <figcaption><b>Lady</b></figcaption>
-                    <img src="./media/lady.jpg" alt="lady.jpg">
-                    <figcaption><b>g: </b>(57, -6)</figcaption>
-                    <figcaption><b>r: </b>(123, -17) </figcaption>
+                    <figcaption><b>Melons (Edge Detection)</b></figcaption>
+                    <img src="./media/melonsedge.jpg" alt="melonsedge.jpg">
+                    <figcaption><b>g: </b>(83, 10)</figcaption>
+                    <figcaption><b>r: </b>(163, 11) </figcaption>
                 </figure>
                 <figure>
                     <figcaption><b>Melons</b></figcaption>
@@ -166,7 +172,7 @@
         </section>
         <section>
             <h2>Edge Detection vs. No Edge Detection</h2>
-            <p> Images transformed with Canny Edge Detection generally do a lot better on a couple of the images than the non-edge-detection counterparts, and around equal on others. Below are some examples. Lady is an outlier where edge detection fairs way worse, this may be due to the soft colors and lack of contrast of the image messing up alignment. Melons' edge detection is off by a couple of pixels. </p>
+            <p> Images transformed with Canny Edge Detection generally do a lot better on a couple of the images than the non-edge-detection counterparts, and around equal on others. Below are some examples. </p>
             <div class="image-grid">
                 <figure>
                     <figcaption><b>Emir (None)</b></figcaption>
@@ -197,16 +203,16 @@
             </div>
             <div class="image-grid">
                 <figure>
-                    <figcaption><b>Lady (None)</b></figcaption>
-                    <img src="./media/lady.jpg" alt="lady.jpg">
-                    <figcaption><b>g: </b>(57, -6)</figcaption>
-                    <figcaption><b>r: </b>(123, -17) </figcaption>
+                    <figcaption><b>Self Portrait (None)</b></figcaption>
+                    <img src="./media/self_portrait2.jpg" alt="self_portrait2.jpg">
+                    <figcaption><b>g: </b>(50, -2)</figcaption>
+                    <figcaption><b>r: </b>(130, -5) </figcaption>
                 </figure>
                 <figure>
-                    <figcaption><b>Lady (Edge Detection)</b></figcaption>
-                    <img src="./media/ladyedge.jpg" alt="ladyedge.jpg">
-                    <figcaption><b>g: </b>(56, 10)</figcaption>
-                    <figcaption><b>r: </b>(-10, -24) </figcaption>
+                    <figcaption><b>Self Portrait (Edge Detection)</b></figcaption>
+                    <img src="./media/self_portrait.jpg" alt="self_portrait.jpg">
+                    <figcaption><b>g: </b>(77, 29)</figcaption>
+                    <figcaption><b>r: </b>(175, 37) </figcaption>
                 </figure>
             </div>
         </section>
