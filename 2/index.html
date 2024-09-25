@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan Cheng CS180 Project 1</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Project 2: Fun with Filters and Frequencies</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <!-- <li><a href="../2/index.html">Project 2</a></li> -->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Part 1.1 - Finite Difference Operator</h2>
+            <img src="./media/diff_op.png" alt="diff_op" width="300">
+            <p> In order to create an effective edge detector, we can define the above finite difference kernels. We can convolve an image with these to get the edges in the x and y directions, respectively. In order to get edges in any orientation, we can take the gradient magnitude by taking the root of the sum of the squares of the edge images in each direction (np.sqrt(convolve(image, Dx)**2 +  convolve(image, Dy)**2)). We then use a threshold to pick out edges from noise, binarizing the image such that values above the threshold are set to 255 and values below the threshold are set to 0. </p>
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Convolved with Dx Kernel</b></figcaption>
+                    <img src="./media/conv_camera_dx.png" alt="conv_camera_dx.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Convolved with Dy Kernel</b></figcaption>
+                    <img src="./media/conv_camera_dy.png" alt="conv_camera_dy.jpg">
+                </figure>
+                
+                <figure>
+                    <figcaption><b>Gradient Magnitude</b></figcaption>
+                    <img src="./media/combined_gradient.png" alt="combined_gradient.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Gradient Magnitude Binarized</b></figcaption>
+                    <img src="./media/combined_gradient_binarized.png" alt="combined_gradient_binarized.jpg">
+                    <figcaption>threshold=0.25</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section>
+            <h2>Part 1.2: Derivative of Gaussian (DoG) Filter</h2>
+            <p> The resulting convolutions of difference operators on raw images are quite noisy, which can be seen in the binarized image as capturing most (but not all) of the edges as well as some noise. We can get rid of some of the noise by convolving the image with a Gaussian kernel first before convolving it with the finite difference kernels. We can observe that the edges are thicker in the images, and there is less noise. </p>
+            <h3>Two Image Convolutions (sigma=2, kernel size=6)</h3>
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Convolved with Dx Kernel</b></figcaption>
+                    <img src="./media/gradient_smoothed_dx.png" alt="conv_smooth_camera_dx.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Convolved with Dy Kernel</b></figcaption>
+                    <img src="./media/gradient_smoothed_dy.png" alt="conv_smooth_camera_dy.jpg">
+                </figure>
+                
+                <figure>
+                    <figcaption><b>Gradient Magnitude</b></figcaption>
+                    <img src="./media/combined_gradient_magnitude_smoothed.png" alt="combined__smooth_gradient.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Gradient Magnitude Binarized</b></figcaption>
+                    <img src="./media/combined_gradient_smoothed.png" alt="combined_smooth_gradient_binarized.jpg">
+                    <figcaption>threshold=0.05</figcaption>
+                </figure>
+            </div>
+            <h3>Single Image Convolution (sigma=2, kernel size=6)</h3>
+            <p>Instead of performing 2 convolutions between image and filters, we can simply convolve the filteres together (the finite difference kernel with the gaussian kernel) to create the Derivative of Gaussian (DoG) Filter before convolving that with the image due to the associative property of convolutions. As can be seen below, this is visually indistinguishable from the previous approach and more computationally efficient.</p>
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Convolved with Dx Kernel</b></figcaption>
+                    <img src="./media/combined_gradient_smoothed_dx.png" alt="conv_smooth_camera_dx.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Convolved with Dy Kernel</b></figcaption>
+                    <img src="./media/combined_gradient_smoothed_dy.png" alt="conv_smooth_camera_dy.jpg">
+                </figure>
+                
+                <figure>
+                    <figcaption><b>Gradient Magnitude</b></figcaption>
+                    <img src="./media/dog_magnitude.png" alt="combined__smooth_gradient.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Gradient Magnitude Binarized</b></figcaption>
+                    <img src="./media/dog_magnitude_threshold.png" alt="combined_smooth_gradient_binarized.jpg">
+                    <figcaption>threshold=0.05</figcaption>
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h2>Part 2.1 Image "Sharpening" </h2>
+            <p> We can visually "sharpen" an image by increasing its high frequencies. In order to do this, we can simply subtract a blurred version of the image (containing the low frequencies, blurred by convolving with the gaussian kernel) from the original to get the high frequencies. We add some constant alpha times these high frequencies to the original image to get our sharpened image. Alpha can be tuned to however sharp we would like the image to be, but this comes at the cost of making noise and edges more visible in the image. </p>
+            
+            <div class="image-grid2">
+                
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/taj.jpg" alt="taj.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Sharpened</b></figcaption>
+                    <img src="./media/tajsharpened.jpg" alt="tajsharpened.jpg">
+                </figure>
+            </div>
+            <h3> Leia (alpha=1, sigma=10, kernel size=30) </h3>
+            <div class="image-grid2">
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/leia.jpg" alt="leia.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Sharpened</b></figcaption>
+                    <img src="./media/leia_sharpened.jpg" alt="leiasharpened.jpg">
+                </figure>
+            </div>
+            <p>As can be seen from the above examples, the contrasts are heightened from sharpening, however noise is also emphasized. We can also see the lossy nature of sharpening by first blurring an original image then sharpening it for comparison.</p>
+            <h3> Sharpening Comparison </h3>
+            We first convolve the original image with a gaussian kernel with sigma=10 and kernel size=30. We then sharpen the image again with the same gaussian kernel but with alpha=2 to get the resharpened image. We can see that while the sharpened image contains details similar to the original, it also introduces artifacts and makes noise more pronounced.
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/cathorse.png" alt="osaka.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Blurred</b></figcaption>
+                    <img src="./media/cathorse_blurred.jpg" alt="osakasharpened.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Sharpened</b></figcaption>
+                    <img src="./media/cathorse_sharpened.jpg" alt="osakasharpened.jpg">
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h2>Part 2.2 Hybrid Images</h2>
+            <p>In this section, we create hybrid images that look like one image when viewed up close but look like another when viewed from far away or while squinting. In order to do this, we combine the low frequencies of one image (the background/image we want visible from far away) and the high frequencies of the second image (the image we want readily apparent at close range). </p>
+            <p>We do this by convolving the background image with a gaussian kernel, and adding that with the difference between the second image and the gaussian kernel convolved with the second image (the higher frequencies for the second image). By modifying the sigma of the gaussian kernels, we can modify which frequency ranges we would like for the lower frequency and higher frequency image. </p>
+            <h3> Derek & Nutmeg (sigma_low=10, sigma_high=10)</h3>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Background (Derek)</b></figcaption>
+                    <img src="./media/DerekPicture.jpg" alt="DerekPicture.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Foreground (Nutmeg)</b></figcaption>
+                    <img src="./media/nutmeg.jpg" alt="nutmeg.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Combined</b></figcaption>
+                    <img src="./media/derekcat.jpg" alt="derekcat.jpg">
+                </figure>
+            </div>
+            <h3> Failure: Horse & Cat (sigma_low=15, sigma_high=25)</h3>
+            <p>An example of a failure I've came across while making these images is trying to fit these 2 images together. While both animals have the same pose, their face shapes are vastly different, which makes it difficult to align their faces and impossible to align their eyes without further modifications to the image. It is also difficult to get the colors of the cat to come out over the horse, possibly because they are similar colors and the cat does not have many edges/higher frequency features in its face. </p>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Background (Horse)</b></figcaption>
+                    <img src="./media/horse.png" alt="horse.png">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Foreground (Cat)</b></figcaption>
+                    <img src="./media/cathorse.png" alt="cathorse.png">
+                </figure>
+                <figure>
+                    <figcaption><b>Combined</b></figcaption>
+                    <img src="./media/chorse.jpg" alt="chorse.jpg">
+                </figure>
+            </div>
+            <h3> Gojo & Uraume (from Jujutsu Kaisen) (sigma_low=3, sigma_high=2)</h3>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Background (Gojo)</b></figcaption>
+                    <img src="./media/gojo.png" alt="gojo.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Foreground (Uraume)</b></figcaption>
+                    <img src="./media/uraume.png" alt="uraume.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Combined</b></figcaption>
+                    <img src="./media/gojraume.jpg" alt="gojraume.jpg">
+                </figure>
+            </div>
+            <h3> King (from Clash Royale) (sigma_low=8, sigma_high=5)</h3>
+            <p>Included below are also the Fourier Transforms of the grayscale versions of the images. It can be seen that at high frequencies the combined image has the frequency signatures of the crying emote, while at low frquencies it has the frequency signature of the laughing emote.</p>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Background (Laughing)</b></figcaption>
+                    <img src="./media/heheheha.png" alt="heheheha.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Foreground (Crying)</b></figcaption>
+                    <img src="./media/kingcrying.jpg" alt="kingcrying.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Combined</b></figcaption>
+                    <img src="./media/heheaww.jpg" alt="heheaww.jpg">
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Background (Laughing)</b></figcaption>
+                    <img src="./media/hehehehafft.png" alt="hehehehafft.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Foreground (Crying)</b></figcaption>
+                    <img src="./media/cryingfft.png" alt="cryingfft.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Combined</b></figcaption>
+                    <img src="./media/combinedfft.png" alt="combinedfft.jpg">
+                </figure>
+            </div>
+            <h3> Bells & Whistles: Color</h3>
+            <p>As can be seen with the examples with Derek and his cat Nutmeg, hybrid images are generally better when we include the colors of both images.</p>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b> Fully Gray</b></figcaption>
+                    <img src="./media/grayderek.jpg" alt="grayderek.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Background Colored</b></figcaption>
+                    <img src="./media/halfgrayderek.jpg" alt="halfgrayderek.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Both Colored</b></figcaption>
+                    <img src="./media/derekcat.jpg" alt="derekcat.jpg">
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h2>Part 2.3 Gaussian and Laplacian Stacks</h2>
+            <p>To process multiple frequencies at a time differently, we implement Gaussian and Laplacian Stacks. In a Gaussian stack, we convolve each layer recursively with a Gaussian kernel to generate a wide range of frequencies represented by the stack. In a Laplacian stack, we take the differences of successive layers in the Gaussian stack in order to extract the frequencies between these images, effectively forming a stack of frequency bands for the image. The last layer in the Laplacian stack is the last layer in the Gaussian stack, and contains the lowest frequencies which were not separated. </p>
+            <h3>Gaussian Stacks (N=5)</h3>
+
+            <div class="image-grid3">
+                <figure>
+                <img src="./media/applegauss.png" alt="applegauss.jpg">
+                </figure>
+                <figure>
+                <img src="./media/orangegauss.png" alt="orangegauss.jpg">
+                </figure>
+            </div>
+            <h3>Laplacian Stacks (N=5)</h3>
+            <div class="image-grid3">
+            <figure>
+            <img src="./media/applelap.png" alt="applelap.jpg">
+            </figure>
+            <figure>
+            <img src="./media/orangelap.png" alt="orangelap.jpg">
+            </figure>
+            </div>
+            <h3> Multiresolution Blending (N=5)</h3>
+            <div class="image-grid3">
+            <figure>
+            <img src="./media/applehalf.png" alt="applehalf.jpg">
+            </figure>
+            <figure>
+            <img src="./media/orangehalf.png" alt="orangehalf.jpg">
+            </figure>
+            <figure>
+            <img src="./media/oraplehalf.png" alt="oraplehalf.jpg">
+            </figure>
+            </div>
+        </section>
+        <section>
+            <h2>Part 2.4 Multiresolution Blending</h2>
+            <p>As can be seen above, we can blend images with similar backgrounds better if we first separate them into Laplacian stacks and create a Gaussian stack out of the mask, and finally mask the images at each frequency range with the corresponding mask from the Gaussian stack and combine them. We display an oraple generated with more layers than the example above below, and also include some more examples. </p>
+            <img src="./media/oraple.png" alt="oraple.jpg">
+            <h3>Tower of Babel & Sand Castle</h3>
+            To make the mask for this image, I simply used photoshop to outline the tower itself after alignment. The mask and the Laplacian stack that was used to make this image are displayed below. If you squint your eyes the image looks amazing, otherwise it's simply alright.
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>The Tower of Babel</b></figcaption>
+                    <img src="./media/babel.jpg" alt="babel.jpg">
+                    <figcaption>The Tower of Babel (Pieter Bruegel the Elder)</figcaption>
+                </figure>
+
+                <figure>
+                    <figcaption><b>Sand Castle</b></figcaption>
+                    <img src="./media/beach.jpg" alt="beach.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Mask</b></figcaption>
+                    <img src="./media/babel_mask.png" alt="babel.jpg">
+                    <figcaption>The Tower of Babel (Pieter Bruegel the Elder)</figcaption>
+                </figure>
+                <figure>
+                    <figcaption><b>Blended</b></figcaption>
+                    <img src="./media/babelsand.png" alt="babel.png">
+                </figure>
+            </div>
+            <div class="image-grid3">
+                <figure>
+                    <figcaption><b>Laplacian Stack</b></figcaption>
+                    <img src="./media/babelstack.jpg" alt="bablestack.jpg">
+                </figure>
+            </div>
+            <h3> Saul Goodman (Better Call Saul) & Joker (2019)</h3>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Saul Goodman</b></figcaption>
+                    <img src="./media/saul.jpg" alt="saul.jpg">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Joker</b></figcaption>
+                    <img src="./media/joker2019.jpg" alt="joker2019.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Spoilers</b></figcaption>
+                    <img src="./media/soker.jpg" alt="soker.jpg">
+                </figure>
+            </div>
+            <h3>Joker (2019) & Osaka (Azumanga Daioh)</h3>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Joker</b></figcaption>
+                    <img src="./media/joker.png" alt="joker.png">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Osaka</b></figcaption>
+                    <img src="./media/osaka.png" alt="osaka.png">
+                </figure>
+                <figure>
+                    <figcaption><b>Self Portrait</b></figcaption>
+                    <img src="./media/josaka.png" alt="josaka.png">
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 <a href="https://github.com/<your_github_username>">My GitHub</a></p>
+    </footer>
+</body>
+</html>
