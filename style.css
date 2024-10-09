@@ -73,6 +73,13 @@ nav ul li a:hover {
     margin-right: 150px;
 }
 
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 25%;
+  }
+
 figure {
     text-align: center;
     margin: 0px;
