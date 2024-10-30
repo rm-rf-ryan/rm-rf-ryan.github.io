@@ -13,7 +13,12 @@ header {
     color: white;
 }
 
-h1, h2 {
+h1 {
+    font-size: 32px;
+    margin: 0;
+}
+
+h2 {
     margin: 0;
 }
 
