@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan Cheng CS180 Project 4</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Project 5: Fun With Diffusion Models!</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../1/index.html">Project 1</a></li>
+                <li><a href="../2/index.html">Project 2</a></li>
+                <li><a href="../3/index.html">Project 3</a></li>
+                <li><a href="../4/index.html">Project 4</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h1>Part A: The Power of Diffusion Models!</h1>
+            <h2>Overview</h2>
+            <p> In the first part of this project I create interesting images and optical illusions using diffusion models, implementing variations of diffusion sampling loops. </p>
+        </section>
+        <section>
+            <h2>Part 0: Setup</h2>
+            <p> We use DeepFloyd IF for all the images generated in this part of the project, accessed via Hugging Face. It consists of 2 stages, the first of which produces images of size 64 x 64, and the second which takes those outputs and generates images of size 256 x 256. </p>
+            <p>I upsample all of the generated images in the second half of part A to 256 x 256 if they are not already 256 x 256, and use a random seed of <b>180</b> for all of the proceeding generations. </p>
+            <p>Below are the generated images for 3 prompts to the model with num_inference_steps = 5 and num_inference_steps = 20 for both stages. </p>
+            <h3 style="text-align: center">num_inference_steps=5</h3>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>an oil painting of a snowy mountain village</b></figcaption>
+                    <img src="./media/oil5.png" alt="chocolate.jpg">
+                </figure>
+    
+                <figure>
+                    <figcaption><b>a man wearing a hat</b></figcaption>
+                    <img src="./media/man5.png" alt="chocolate_rect.png">
+                </figure>
+                <figure>
+                    <figcaption><b>a rocket ship</b></figcaption>
+                    <img src="./media/rocket5.png" alt="chocolate_rect.png">
+                </figure>
+            </div>
+            <h3 style="text-align: center">num_inference_steps=20</h3>
+            <div class="image-grid">
+                
+                <figure>
+                    <figcaption><b>an oil painting of a snowy mountain village</b></figcaption>
+                    <img src="./media/oil20.png" alt="chocolate.jpg">
+                </figure>
+    
+                <figure>
+                    <figcaption><b>a man wearing a hat</b></figcaption>
+                    <img src="./media/man20.png" alt="chocolate_rect.png">
+                </figure>
+                <figure>
+                    <figcaption><b>a rocket ship</b></figcaption>
+                    <img src="./media/rocket20.png" alt="chocolate_rect.png">
+                </figure>
+            </div>
+            <p>The images match the text prompts pretty well, even for a small number of inference steps, however the quality of the output varies based on the number of inference steps. There are visible noise artifacts from the generations with a small number of inference steps due to the upscaling (second stage) not being run for enough iterations. In addition, the images generated do not look very realistic (the proportions of the man's face are off as well as the number of fingers on his hand, as well as the rocket's flames being inconsistently drawn) which is probably due to the first stage not being run for enough inference steps. Larger inference steps seem to fix this, however the resulting images seem more cartoonish. </p>
+         </section>
+
+         <section>
+            <h2>Part 1: Sampling Loops</h2>
+            <p> We can start with a clean image x0 and iteratively add noise sampled from a Gaussian distribution for each timestep t until we end up with pure noise at timestep T. A diffusion model learns to reverse this process, given a noisy xt and timestep t it predicts the noise in the image. With this we can estimate the initial x0 or remove part of the noise, giving us xt-1. For DeepFloyd models, T=1000, and there are particular noise coefficients alpha bar t that dictate how we should add noise. </p>
+            <h3>1.1 Implementing the Forward Process</h3>
+            <img src="./media/forward.png" alt="forward_op" width="300" class="">
+            <p>In the forward process, we add noise to an image following the above equation for t from 0 to 999. This gives us progressively more noisy images, as shown below (not upscaled). </p>
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Berkeley Campanile (original)</b></figcaption>
+                    <img src="./media/campanile.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>t=250</b></figcaption>
+                    <img src="./media/campanile250.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>t=500</b></figcaption>
+                    <img src="./media/campanile500.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>t=750</b></figcaption>
+                    <img src="./media/campanile750.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+         </section>
+
+         <section>
+            <h3>1.2 Classical Denoising</h3>
+            <p>We can attempt to denoise the image by convolving it with the Gaussian kernel, effectively blurring it. This works somewhat, but does not look very nice. I use a kernel size of 7 and sigma of 2 for the Gaussian kernel. </p>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Noisy t=250</b></figcaption>
+                    <img src="./media/campanile250.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy t=500</b></figcaption>
+                    <img src="./media/campanile500.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy t=750</b></figcaption>
+                    <img src="./media/campanile750.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="./media/campanileblur250.png" alt="chocolate.jpg">
+                    <figcaption><b>Blurred t=250</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/campanileblur500.png" alt="chocolate.jpg">
+                    <figcaption><b>Blurred t=500</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/campanileblur750.png" alt="chocolate.jpg">
+                    <figcaption><b>Blurred t=750</b></figcaption>
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h3>1.3 Implementing One-Step Denoising</h3>
+            <p>We can use the pretrained DeepFloyd model's stage 1 denoiser to predict and remove the noise added to the image in a single step. We can solve the equation in the previous section for x0 and use this to scale and subtract the estimated noise: </p>
+            <img src="./media/denoise.png" alt="forward_op" width=200 class="">
+            <p>The resulting images are displayed below for t=250, 500, and 750:</p>
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Berkeley Campanile (original)</b></figcaption>
+                    <img src="./media/campanile.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy t=250</b></figcaption>
+                    <img src="./media/campanile250.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy t=500</b></figcaption>
+                    <img src="./media/campanile500.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy t=750</b></figcaption>
+                    <img src="./media/campanile750.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid1">
+                <figure>
+                    <img src="./media/campanile.png" alt="chocolate.jpg">
+                    <figcaption><b>Original (unchanged)</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/campaniledenoise250.png" alt="chocolate.jpg">
+                    <figcaption><b>Denoised t=250</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/campaniledenoise500.png" alt="chocolate.jpg">
+                    <figcaption><b>Denoised t=500</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/campaniledenoise750.png" alt="chocolate.jpg">
+                    <figcaption><b>Denoised t=750</b></figcaption>
+                </figure>
+            </div>
+            <p>We can see that the denoising UNet does a lot better of a job of projecting the image onto the manifold of natural images, although more of the details are hallucinated the more noisy the original image is. </p>
+        </section>
+        <section>
+            <h3>1.4 Implementing Iterative Denoising</h3>
+            <p>Diffusion models work better when denoised iteratively. We can skip some steps to speed up inference, stepping from T=990 to T=0 in steps of 30. The update rule taking the stride into account is below:</p>
+            <img src="./media/iterative.png" width=300 alt="chocolate.jpg">
+            <p>t' is the next timestep (less than the current timestep t), alpha t = alpha bar t / alpha bar t', beta = 1 - alpha t, and x0 is the current estimate of the clean image using the equation for x0 in section 1.3. v sigma is the random noise DeepFloyd predicted. </p>
+            <p>The results are displayed below with noise from i_start = 10 and timestep[10] and compared to the previous 2 methods we tried above. </p>
+            <div class="image-grid4">
+                <figure>
+                    <figcaption><b>Noisy Campanile at t=690</b></figcaption>
+                    <img src="./media/iter690.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy Campanile at t=540</b></figcaption>
+                    <img src="./media/iter540.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy Campanile at t=390</b></figcaption>
+                    <img src="./media/iter390.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy Campanile at t=240</b></figcaption>
+                    <img src="./media/iter240.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Noisy Campanile at t=90</b></figcaption>
+                    <img src="./media/iter90.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid1">
+                <figure>
+                    <img src="./media/campanile.png" alt="chocolate.jpg">
+                    <figcaption><b>Original</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/iter.png" alt="chocolate.jpg">
+                    <figcaption><b>Iterative Denoising</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/onestep.png" alt="chocolate.jpg">
+                    <figcaption><b>One-Step Denoising</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/blur.png" alt="chocolate.jpg">
+                    <figcaption><b>Gaussian Blurred</b></figcaption>
+                </figure>
+            </div>
+            <p>We can see that the iterative generation produces a higher quality image with more details, however most of these details are hallucinated. </p>
+        </section>
+        <section>
+            <h3>1.5 Diffusion Model Sampling</h3>
+            <p>We can also repeat the iterative process in 1.4 and denoise images from randomly sampled noise and i_start=0, effectively projecting the noisy images onto the manifold of images learned by the model. We use a "null" prompt that doesn't have any specific meaning, "a high quality photo", in the following generations from random noise (upscaled): </p>
+            <div class="image-grid4">
+                <figure>
+                    <figcaption><b>Sample 1</b></figcaption>
+                    <img src="./media/diffusion1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Sample 2</b></figcaption>
+                    <img src="./media/diffusion2.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Sample 3</b></figcaption>
+                    <img src="./media/diffusion3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Sample 4</b></figcaption>
+                    <img src="./media/diffusion4.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Sample 5</b></figcaption>
+                    <img src="./media/diffusion5.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h3>1.6 Classifier-Free Guidance (CFG)</h3>
+            <p>The generated images are somewhat nonsensical. To improve image quality at the expense of image diversity, we implement Classifier-Free Guidance. We compute a conditional and unconditional noise estimate epsilon c and epsilon u, and set our new noise estimate to be:</p>
+            <img src="./media/epsilon_combined.png" width=150 alt="chocolate.jpg">
+            <p>Where gamma is a scaling factor. We set gamma = 7 for the following generations, and use a nuill prompt of "" for the unconditional guidance noise estimate. The upscaled results are displayed below:</p>
+            <div class="image-grid4">
+                <figure>
+                    <figcaption><b>CFG Sample 1</b></figcaption>
+                    <img src="./media/cfg1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>CFG Sample 2</b></figcaption>
+                    <img src="./media/cfg2.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>CFG Sample 3</b></figcaption>
+                    <img src="./media/cfg3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>CFG Sample 4</b></figcaption>
+                    <img src="./media/cfg4.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>CFG Sample 5</b></figcaption>
+                    <img src="./media/cfg5.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h3>1.7 Image-to-image Translation</h3>
+            <p>We can make edits to an existing image by taking an image, noising it, and forcing it back to the image manifold without conditioning, following the SDEdit algorithm. We run forward with starting indices of [1,3,5,7,10,20] and apply it to the Campanile image, as well as 2 pictures I've taken (one of Osaka castle and another of me and my friends), displaying the upsampled results below (original images are shown at 256x256 resolution for comparison but they are inputted to the model as 64x64): </p>
+            <div class="image-grid5">
+                <figure>
+                    <figcaption><b>i = 1</b></figcaption>
+                    <img src="./media/campaniletrans1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 3</b></figcaption>
+                    <img src="./media/campaniletrans3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 5</b></figcaption>
+                    <img src="./media/campaniletrans5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 7</b></figcaption>
+                    <img src="./media/campaniletrans7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 10</b></figcaption>
+                    <img src="./media/campaniletrans10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 20</b></figcaption>
+                    <img src="./media/campaniletrans20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/campanilelarge.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid5">
+                <figure>
+                    <img src="./media/castletrans1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castletrans3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castletrans5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castletrans7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castletrans10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castletrans20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/osaka.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid5">
+                <figure>
+                    <img src="./media/ryantrans1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryantrans3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryantrans5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryantrans7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryantrans10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryantrans20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryan.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h4>1.7.1 Editing Hand-Drawn and Web Images</h4>
+            <p>We can use the above procedure to project nonrealistic images onto the natural image manifold. Displayed below are 1 result from the Internet (Osaka from Azumanga Daioh) as well as 2 of my own sketches. </p>
+            <div class="image-grid5">
+                <figure>
+                    <figcaption><b>i = 1</b></figcaption>
+                    <img src="./media/osaka1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 3</b></figcaption>
+                    <img src="./media/osaka3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 5</b></figcaption>
+                    <img src="./media/osaka5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 7</b></figcaption>
+                    <img src="./media/osaka7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 10</b></figcaption>
+                    <img src="./media/osaka10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 20</b></figcaption>
+                    <img src="./media/osaka20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/osaka_anime.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid5">
+                <figure>
+                    <img src="./media/cat1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/cat3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/cat5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/cat7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/cat10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/cat20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/cat.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid5">
+                <figure>
+                    <img src="./media/boat1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/boat3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/boat5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/boat7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/boat10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/boat20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/drawnisland.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h4>1.7.2 Inpainting</h4>
+            <p>We can direct where the model should hallucinate new information by using a binary mask with the original image. Given an image x_orig and a binary mask m, we create a new image with the same content where m is 0 and new content where m is 1. We use same diffusion denoising loop except updating xt with the following after every step:</p>
+            <img src="./media/inpaint.png" width=300 alt="chocolate.jpg">
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/campanilelarge.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Mask</b></figcaption>
+                    <img src="./media/campanile_mask.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Hole to Fill</b></figcaption>
+                    <img src="./media/masked_campanile.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Inpainted & Upscaled</b></figcaption>
+                    <img src="./media/campanile_inpaint.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid1">
+                <figure>
+                    <img src="./media/osaka.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castle_mask.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/masked_castle.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castle_inpaint.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid1">
+                <figure>
+                    <img src="./media/ryan.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryan_mask.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/masked_ryan.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryan_inpaint.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <p>Notably, upscaling ends up modifying features from the original image. In general, I believe that this is helpful in making a more cohesive image, however in some cases we do not want this to happen. In Part 2: Bells and Whistles I examine using a binary mask and our old friend Laplacian Blending with the 256x256 image and the upscaled image to keep details from the original image. </p>
+        </section>
+        <section>
+            <h4>1.7.3 Text-Conditional Image-to-image Translation</h4>
+            <p> We repeat the process in 1.7 and 1.7.1, perturbing the images with noise, except this time we guide it with a text prompt "a rocket ship" instead of "a high quality photo" to guide generation towards the image subspace of rockets.</p>
+            <div class="image-grid5">
+                <figure>
+                    <figcaption><b>i = 1</b></figcaption>
+                    <img src="./media/rocketcampanile1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 3</b></figcaption>
+                    <img src="./media/rocketcampanile3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 5</b></figcaption>
+                    <img src="./media/rocketcampanile5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 7</b></figcaption>
+                    <img src="./media/rocketcampanile7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 10</b></figcaption>
+                    <img src="./media/rocketcampanile10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>i = 20</b></figcaption>
+                    <img src="./media/rocketcampanile20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/campanilelarge.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid5">
+                <figure>
+                    <img src="./media/rocketcastle1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketcastle3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketcastle5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketcastle7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketcastle10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketcastle20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/osaka.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid5">
+                <figure>
+                    <img src="./media/rocketryan1.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketryan3.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketryan5.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketryan7.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketryan10.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/rocketryan20.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryan.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            
+        </section>
+        <section>
+            <h3>1.8 Visual Anagrams</h3>
+            <p>We now proceed to make optical illusions using our diffusion models. In this section, we create an image that looks like one prompt but when flipped upside down looks like another prompt. In order to do this, we compute 2 separate noise estimates using the first prompt and the flipped image with the second prompt and average them t: </p>
+            <img src="./media/visual_anagrams.png" width=200 alt="chocolate.jpg">
+            <p>When we upscale the images, we use the "null" prompt "a high quality photo". </p>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>an oil painting of people around a campfire</b></figcaption>
+                    <img src="./media/campfire.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>a photo of a hipster barista</b></figcaption>
+                    <img src="./media/barista.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>an oil painting of a snowy mountain village</b></figcaption>
+                    <img src="./media/village.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid">
+                <figure>
+                    <img src="./media/old_man.png" alt="chocolate.jpg">
+                    <figcaption><b>an oil painting of an old man</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/dog.png" alt="chocolate.jpg">
+                    <figcaption><b>a photo of a dog</b></figcaption>
+                </figure>
+                <figure>
+                    <img src="./media/waterfall.png" alt="chocolate.jpg">
+                    <figcaption><b>a lithograph of waterfalls</b></figcaption>
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h3>1.10 Hybrid Images</h3>
+            <p>We can create hybrid images in a similar process to 1.8, by combining noise estimates. This time, we perform a lowpass filter (convolve with gaussian) for one prompt's noise estimate, and a high pass (laplacian filter) of the second prompt's noise estimate: </p>
+            <img src="./media/hybrid.png" width=200 alt="chocolate.jpg">
+            
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 <a href="https://github.com/<your_github_username>">My GitHub</a></p>
+    </footer>
+</body>
+</html>

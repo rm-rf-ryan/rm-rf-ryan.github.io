@@ -77,6 +77,23 @@ nav ul li a:hover {
     margin-left: 150px;
     margin-right: 150px;
 }
+.image-grid4 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+    margin-left: 150px;
+    margin-right: 150px;
+}
+
+.image-grid5 {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+    margin-left: 150px;
+    margin-right: 150px;
+}
 
 .center {
     display: block;
