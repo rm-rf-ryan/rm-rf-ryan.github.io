@@ -561,8 +561,8 @@
                     <img src="./media/ryan.png" alt="chocolate.jpg">
                 </figure>
             </div>
-            
         </section>
+        
         <section>
             <h3>1.8 Visual Anagrams</h3>
             <p>We now proceed to make optical illusions using our diffusion models. In this section, we create an image that looks like one prompt but when flipped upside down looks like another prompt. In order to do this, we compute 2 separate noise estimates using the first prompt and the flipped image with the second prompt and average them t: </p>
@@ -601,7 +601,20 @@
             <h3>1.10 Hybrid Images</h3>
             <p>We can create hybrid images in a similar process to 1.8, by combining noise estimates. This time, we perform a lowpass filter (convolve with gaussian) for one prompt's noise estimate, and a high pass (laplacian filter) of the second prompt's noise estimate: </p>
             <img src="./media/hybrid.png" width=200 alt="chocolate.jpg">
-            
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Hybrid skull and waterfall</b></figcaption>
+                    <img src="./media/skull_waterfall.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Hybrid dog and Amalfi Coast</b></figcaption>
+                    <img src="./media/dog_coast.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>aHybrid pencil and man in a hat</b></figcaption>
+                    <img src="./media/man_pencil.png" alt="chocolate.jpg">
+                </figure>
+            </div>
         </section>
     </main>
 
