@@ -611,11 +611,150 @@
                     <img src="./media/dog_coast.png" alt="chocolate.jpg">
                 </figure>
                 <figure>
-                    <figcaption><b>aHybrid pencil and man in a hat</b></figcaption>
+                    <figcaption><b>Hybrid pencil and man in a hat</b></figcaption>
                     <img src="./media/man_pencil.png" alt="chocolate.jpg">
                 </figure>
             </div>
         </section>
+        <section>
+            <h2>Part 2: Bells and Whistles</h2>
+            <p>Recall in part 1.7.2, the upscaling of inpainted images results in details the original image also being hallucinated. I experiment with using multi-resolution blending to combine the upscaled in-painted image with the 256x256 original image to preserve the original image's details as opposed to simply masking the upscaled in-painted image over the original image. </p>
+            <p>Using multi-resolution blending, we find marginal improvements over naive cropping, although the efficacy definitely depends on the images used. </p>
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/campanilelarge.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Inpainted & Upscaled</b></figcaption>
+                    <img src="./media/campanile_inpaint.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Cropped onto Original</b></figcaption>
+                    <img src="./media/campanile_inpaint_crop.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>Multi-Resolution Blending</b></figcaption>
+                    <img src="./media/campanile_inpaint_blend.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid1">
+                <figure>
+                    <img src="./media/osaka.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castle_inpaint.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castle_inpaint_crop.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/castle_inpaint_blend.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <div class="image-grid1">
+                <figure>
+                    <img src="./media/ryan.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryan_inpaint.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryan_inpaint_crop.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <img src="./media/ryan_inpaint_blend.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+        </section>
+
+        <section>
+            <h1>Part B: Diffusion Models from Scratch!</h1>
+            <h2>Overview</h2>
+            <p>In the second part of this project we implement, train, and test the UNet architecture on denoising and generating images using the MNIST dataset. Time Conditioning and Class Conditioning with classifier-free guidance are incorporated into our model. </p>
+        </section>
+        <section>
+            <h2>Part 1: Training a Single-Step Denoising UNet</h2>
+            <p>We first optimize a simple one-step denoiser over the L2 loss between the model's prediction and the clean image. </p>
+            <h3>1.1 Implementing the UNet</h3>
+            <p>We implement the following architecture for an Unconditional UNet:</p>
+            <img src="./media/uncondune5t.png" width=1000 alt="chocolate.jpg">
+            <h3>1.2 Using the UNet to Train a Denoiser</h3>
+            <p>For each training batch, we generate z=x + sigma * epsilon, where epsilon is sampled from N(0, I). We input z into our model, and train it using the L2 distance between the model's prediction for z and the original image x. </p>
+            <p>We visualize the varying levels of noise on the MNIST digits below: </p>
+            <img src="./media/mnist_noise.png" width=50% alt="chocolate.jpg" class="center">
+            <h4>1.2.1 Training</h4>
+            <p>We train the model to denoise noisy images with sigma=0.5, with batch size 256, 5 epochs, hidden dimension 128, and adam optimizer with learning rate 1e-4. </p>
+            <p>The loss curve is plotted below:</p>
+            <img src="./media/unconditioned_loss.png" width=50% alt="chocolate.jpg" class="center">
+            <p>We visualize the denoised results on a small test sample batch for 1 epoch and 5 epochs:</p>
+            <div class="image-grid2">
+                <figure>
+                    <figcaption><b>1 epoch</b></figcaption>
+                    <img src="./media/1epochresult.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>5 epochs</b></figcaption>
+                    <img src="./media/5epochresult.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <p>This UNet does a pretty good job at denoising the images at the noise level it is trained on. </p>
+            <h4>1.2.2 Out-of-Distribution Testing</h4>
+            <p>In this section, we see how well the denoiser does at different noise levels, for sigma in [0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0]. </p>
+            <img src="./media/denoise_zero.png" width=50% alt="chocolate.jpg" class="center">
+            <p>We can observe that the model generally does worse for noise levels it was not trained on, but this effect is most pronounced at higher noise levels as opposed to lower noise levels. </p>
+        </section>
+        <section>
+            <h2>Part 2: Training a Diffusion Model</h2>
+            <p>Instead of training with the L2 loss between our model's predicted image and the clean image, we instead iteratively denoise the image by training the model instead on the L2 loss between the model's prediction and the noise added to the image. </p>
+            <p> We use the same formula as the forward process in part A to generate noisy images. Our betas are set to be evenly spaced between beta0=0.0001 and betaT=0.02 for beta between 1 and T-1, and the alphas and alpha bars are defined based on the betas as in part A. </p>
+            <p>We use T=300 instead of T=1000 in part A as MNIST digits are relatively simple.</p>
+            <h3>2.1 Adding Time Conditioning to UNet</h3>
+            <p>We condition our UNet model with the time t that the model should be trained on by inserting FC blocks in the following manner, normalizing t before embedding it as t/T:</p>
+            <img src="./media/time_conditioning_diagram.png" width=50% alt="chocolate.jpg" class="center">
+            <h3>2.2 Training the UNet</h3>
+            <p> We follow the following algorithm to train our time-conditioned UNet, sampling a random image from the training set, a random t, and training the denoiser to predict the noise in xt: </p>
+            <img src="./media/time_conditioned_training.png" width=50% alt="chocolate.jpg" class="center">
+            <p>The loss curve for this model is displayed below:</p>
+            <img src="./media/time_conditioned_loss.png" width=50% alt="chocolate.jpg" class="center">
+            <h3>2.3 Sampling from the UNet</h3>
+            <p>We follow a similar sampling process to part A, except we don't predict the variance:</p>
+            <img src="./media/time_conditioned_sampling.png" width=50% alt="chocolate.jpg" class="center">
+            <p>Our sampling results for the time-conditioned UNet for 5 and 20 epochs are displayed below:</p>
+            <div class="image-grid2">
+                <figure>
+                    <figcaption><b>5 epochs</b></figcaption>
+                    <img src="./media/time5epochresult.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>20 epochs</b></figcaption>
+                    <img src="./media/time20epochresult.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <p>We can see that the model does a bit poorly, generating some recognizable digits from random noise, however there are also a lot of random strokes and figures that do not look like digits.</p>
+            <h3>2.4 Adding Class-Conditioning to UNet</h3>
+            <p>We can get better results by also conditioning UNet on the class of the digit 0-9. This requires us to embed 2 more FCBlocks to the UNet (in the same locations that the blocks for t are placed, except multiplying the model outputs instead ofbeng added onto them). </p>
+            <p>To make the model still work without being conditioned on the class, we also implement dropout, masking the class conditioning vector c to 0 for 10% of the training time. The class conditioned training algorithm is displayed below:</p>
+            <img src="./media/algo3_c.png" width=50% alt="chocolate.jpg" class="center">
+            <p>Our training loss curve for this model is as follows:</p>
+            <img src="./media/class_conditioned_loss.png" width=50% alt="chocolate.jpg" class="center">
+            <h3>2.5 Sampling from the Class-Conditioned UNet</h3>
+            <p>The sampling process is the same as part A, and we use classifier-free guidance with gamma=5.0 to improve the conditional results. The algorithm is displayed below:</p>
+            <img src="./media/algo4_c.png" width=50% alt="chocolate.jpg" class="center">
+            <p>We visualize our results for all 10 digits below for epochs 5 and 20:</p>
+            <div class="image-grid2">
+                <figure>
+                    <figcaption><b>5 epochs</b></figcaption>
+                    <img src="./media/class5epochresult.png" alt="chocolate.jpg">
+                </figure>
+                <figure>
+                    <figcaption><b>20 epochs</b></figcaption>
+                    <img src="./media/class20epochresult.png" alt="chocolate.jpg">
+                </figure>
+            </div>
+            <p>We can see that the results for both epochs are relatively good, but the 20 epoch model tends to keep more finer details. </p>
+        </section>
+
     </main>
 
     <footer>
