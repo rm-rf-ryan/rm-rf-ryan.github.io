@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan Cheng CS180 Project 5</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <h1>Final Project(s): Gradient Domain Fusion & Light Field Camera</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../1/index.html">Project 1</a></li>
+                <li><a href="../2/index.html">Project 2</a></li>
+                <li><a href="../3/index.html">Project 3</a></li>
+                <li><a href="../4/index.html">Project 4</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h1>Gradient Domain Fusion</h1>
+            <h2>Overview</h2>
+            <p> In this project, we investigate processing images in the gradient domain, which allows many different forms of image processing. We implement and investigate Poisson Blending and Mixed Gradient Blending.</p>
+            <p> The primary goal is to seamlessly blend an object from a source image s to a target image t. The approach of Poisson blending is to set up the problem as finding values for target pixels that maximally preserve the gradient of the source region (gradients of images are more noticable than overall intensity). This might change the color of the object, but it would be recognizable as the same object.</p>
+            <p>This is formatted as the following least squares problem, where v are new intensity values within the source region S (the masked source image), i is a pixel within the source region, and j is a 4-neighbor of i:</p>
+            <img src="./media/poissonblend_eq.png" alt="poissonblend_eq.png" width="500" class="">
+            <p>This is an adaptation of the methods in <a href="http://www.cs.brown.edu/courses/csci1950-g/asgn/proj2/resources/PoissonImageEditing.pdf">Perez et al. 2003</a></p>
+        </section>
+            <h2>Toy Problem</h2>
+            <p> A simple toy problem to get started with gradient domain processing is to try to reconstruct an image from its gradient values plus one pixel intensity. For each pixel, we have the following 2 objectives:</p>
+            <ol>
+                <li>minimize (v(x+1,y)-v(x,y) - (s(x+1,y)-s(x,y)))^2 (x-gradients of v should be close to the x-gradients of s)</li>
+                <li>minimize (v(x,y+1)-v(x,y) - (s(x,y+1)-s(x,y)))^2 (y-gradients of v should be close to the y-gradients of s)</li>
+            </ol>
+            <p>We also add the following constraint, since the above can be solved while adding any constant value to v:</p>
+            <ol>
+                <li value="3">minimize (v(0,0)-s(0,0))^2 (the top left corners of both images should be the same)</li>
+            </ol>
+            <p>This can be formulated as a sparse least squares problem Av=b. The source image and the reconstruction are shown below (and are virtually indistinguishable with error ~0.001).</p>
+            <div class="image-grid2">
+                <figure>
+                    <figcaption><b>Original</b></figcaption>
+                    <img src="./media/toy_problem.png" alt="toy_problem">
+                </figure>
+    
+                <figure>
+                    <figcaption><b>Reconstruction</b></figcaption>
+                    <img src="./media/toy_reconstruction.png" alt="toy_reconstruction">
+                </figure>
+            </div>
+        </section>
+        <section>
+            <h2>Poisson Blending</h2>
+            <p> The implementation of Poisson blending is stated in the Overview. In practice, we mask a region in the source image that will be our S, locate where in the target image t we want S to be placed, and solve the least squares problem given in the overview for points in S and corresponding points in t. </p>
+            <p>For example, we can see the results on blending this image of a penguin with images of hikers. </p>
+            <div class="image-grid1">
+                <figure>
+                    <figcaption><b>Target image t</b></figcaption>
+                    <img src="./media/im2.JPG" alt="toy_problem">
+                </figure>
+    
+                <figure>
+                    <figcaption><b>Source image s</b></figcaption>
+                    <img src="./media/penguin-chick.jpeg" alt="toy_reconstruction">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Source Cropped Onto Target</b></figcaption>
+                    <img src="./media/penguin_crop.png" alt="toy_reconstruction">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Poisson Blended</b></figcaption>
+                    <img src="./media/penguin_basic_blend.png" alt="toy_reconstruction">
+                </figure>
+            </div>
+            <p>We can see that the poisson blending blends the source image quite well into the target. There are some artifacts near the bottom of the penguin that are visible due to there being edges in the source image (the snow the penguin is standing on) that were not cropped out. There is also noticeable blur around the penguin. These are fixed in the folowing section on Mixed Gradient Blending, where more examples are also shown. </p>
+        </section>
+        <section>
+            <h2>Bells & Whistles: Mixed Gradient Blending</h2>
+            <p>To implement Mixed Gradient Blending we make a slight modification to the Poisson Blending least squares problem. Instead of using the source gradient as the guide, we instead use the gradient in the source or target with larger magnitude d_ij. abs(s_i-s_j) > abs(t_i-t_j), then d_ij = s_i-s_j; else d_ij = t_i-t_j</p>
+            <img src="./media/textureblend_eq.png" alt="poissonblend_eq.png" width="500" class="">
+            <p>Examples with the source cropped onto the target, the Poisson Blended, and Mixed Gradient Blended images are shown below. </p>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Source Cropped Onto Target</b></figcaption>
+                    <img src="./media/penguin_crop.png" alt="toy_reconstruction">
+                </figure>
+                
+                <figure>
+                    <figcaption><b>Poisson Blended</b></figcaption>
+                    <img src="./media/penguin_basic_blend.png" alt="toy_reconstruction">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Mixed Gradient Blended</b></figcaption>
+                    <img src="./media/penguin_basic_mixed.png" alt="toy_reconstruction">
+                </figure>
+            </div>
+            We can see that the issue with blurring around the penguin has been solved by mixed gradient blending A similar example that works well is displayed below for another photo of hikers in the snow.
+
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Source Cropped Onto Target</b></figcaption>
+                    <img src="./media/ant_hiker_crop.png" alt="toy_reconstruction">
+                </figure>
+                
+                <figure>
+                    <figcaption><b>Poisson Blended</b></figcaption>
+                    <img src="./media/ant_hiker_blend.png" alt="toy_reconstruction">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Mixed Gradient Blended</b></figcaption>
+                    <img src="./media/ant_hiker_mixed.png" alt="toy_reconstruction">
+                </figure>
+            </div>
+            <p>Below is an example of colors changing during the blending process. This is probably due to the background of the source not being similar enough in color to the target image. It is noted that poisson blending is actually preferable in this instance to mixed-gradient blending, as some artifacts from the target image can appear on the source image through mixed-gradient blending (e.g. boats appearing on Hatsune Miku's hair). </p>
+            <div class="image-grid">
+                <figure>
+                    <figcaption><b>Source Cropped Onto Target</b></figcaption>
+                    <img src="./media/kw_miku_crop.png" alt="toy_reconstruction">
+                </figure>
+                
+                <figure>
+                    <figcaption><b>Poisson Blended</b></figcaption>
+                    <img src="./media/kw_miku_blend.png" alt="toy_reconstruction">
+                </figure>
+
+                <figure>
+                    <figcaption><b>Mixed Gradient Blended</b></figcaption>
+                    <img src="./media/kw_miku_mixed.png" alt="toy_reconstruction">
+                </figure>
+            </div>
+           <p>Below is an example of a source image having a nonuniform background (as well as colors changing slightly). Since we are blending gradients and the background of the source image has high image gradients due to its edges, neither image blending technique works very well. </p> 
+           <div class="image-grid">
+            <figure>
+                <figcaption><b>Source Cropped Onto Target</b></figcaption>
+                <img src="./media/kw_reimu_crop.png" alt="toy_reconstruction">
+            </figure>
+            
+            <figure>
+                <figcaption><b>Poisson Blended</b></figcaption>
+                <img src="./media/kw_reimu_blend.png" alt="toy_reconstruction">
+            </figure>
+
+            <figure>
+                <figcaption><b>Mixed Gradient Blended</b></figcaption>
+                <img src="./media/kw_reimu_mixed.png" alt="toy_reconstruction">
+            </figure>
+        </div>
+        </section>
+        <section>
+            <h1> Light Field Camera </h1>
+            <h2>Overview</h2>
+            <p> Capturing multiple images over a plane orthogonal to the optical axis allows us to achieve complex effects using simple operations such as shifting and averaging. In this project, we reproduce depth refocusing and aperture adjustment effects using light field data as detailed in <a href="http://graphics.stanford.edu/papers/lfcamera/lfcamera-150dpi.pdf">Ng et al.</a> </p>
+            <p>We use data from the <a href="http://lightfield.stanford.edu/lfs.html">Stanford Light Field Archive</a> for the light field data. </p>
+        </section>
+        <section>
+            <h2>Depth Refocusing</h2>
+            <p>We can shift the light field images based on their (x y) position in the photosensor grid relative to the (x y) position of the center of the grid. The Stanford Light Field Archive images captured 289 images in a 17x17 grid, and so we shift the images by x_shift = c*(x-8) and y_shift=-c*(y-8). c is an arbitrary constant that is varied to give the depth that the simulated camera is focused at. </p>
+            <p>Below are gifs of results of varying c from c=0 to c=3.5 in steps of 0.1 for the chessboard and amethyst datasets. </p>
+
+            <img src="./media/chess_depth.gif" alt="chess_depth.gif" width="750" class="center">
+            <img src="./media/amethyst_depth.gif" alt="amethyst_depth.gif" width="500" class="center">
+        </section>
+        <section>
+            <h2>Aperture Adjustment</h2>
+            <p>We can use a similar process to simulate a camera of larger and smaller apertures. Averaging a large number of images sampled over the light field grid mimics a camera with an effectively larger aperture, while averaging smaller numbers of images mimics a smaller aperture. To implement this in practice, we define a constant aperture size a, and if |x-8| and |y-8| > a then we do not include it in the picture</p>
+            <p>The gifs below are produced varying a from 0 to 20 in steps of 0.5 at c=0.8. Increasing the aperture size effectively blurs the image before and beyond the focused depth. </p>
+            <img src="./media/chess_aperture.gif" alt="chess_depth.gif" width="750" class="center">
+            <img src="./media/amethyst_aperture.gif" alt="amethyst_depth.gif" width="500" class="center">
+        </section>
+        <section>
+            <h3>Summary</h3>
+            <p>In summary, we can manipulate images taken over a plane orthogonal to the optical axis to mimic classical optical effects such as depth refocusing and aperture adjustment. I found this quite interesting, since this can just be done via post-processing in software as opposed to having to physically manipulate a camera and retake a photo. </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 <a href="https://github.com/rm-rf-ryan">My GitHub</a></p>
+    </footer>
+</body>
+</html>
