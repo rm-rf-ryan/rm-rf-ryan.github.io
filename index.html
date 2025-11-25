@@ -1,32 +1,179 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ryan Cheng CS180/280A Portfolio</title>
-    <link rel="stylesheet" href="style.css">
+<!DOCTYPE HTML>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <title>Ryan Cheng</title>
+
+  <meta name="author" content="Ryan Cheng">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="icon" type="image/png" href="images/bair.png">
 </head>
+
 <body>
-    <header>
-        <h1>Ryan Cheng CS180/280A Portfolio</h1>
-        <nav>
-            <ul>
-                <li><a href="./1/index.html">Project 1</a></li>
-                <li><a href="./2/index.html">Project 2</a></li>
-                <li><a href="./3/index.html">Project 3</a></li>
-                <li><a href="./4/index.html">Project 4</a></li>
-                <li><a href="./5/index.html">Project 5</a></li>
-                <li><a href="./final/index.html">Final Project</a></li>
-            </ul>
-        </nav>
-    </header>
+  <table style="width:100%;max-width:900px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+    <tr style="padding:0px">
+      <td style="padding:0px">
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+          <tr style="padding:0px">
+            <td style="padding:2.5%;width:63%;vertical-align:middle">
+              <p style="text-align:center">
+                <name>Ryan Cheng</name>
+              </p>
 
-    <main>
-        <p>Click on the links above to view the projects.</p>
-    </main>
+              <p>I am a 5th-year M.S. student in Computer Science at UC Berkeley in the <a href="https://bair.berkeley.edu/">Berkeley Artificial Intelligence Research (BAIR)</a> Lab, advised by <a href="https://people.eecs.berkeley.edu/~svlevine/">Sergey Levine</a>. I previously completed my B.A. in Computer Science and Physics, where I worked with Professors <a href="https://physics.berkeley.edu/people/faculty/michael-crommie">Michael Crommie</a> and <a href="https://physics.berkeley.edu/people/faculty/alex-zettl">Alex Zettl</a> in the Physics Department.</p> 
+              
+              <p>My research focuses on training LLMs to engage in reliable, coherent, and value-aligned free-form dialogue. I am particularly interested in advancing the foundations of LLM Agents—how they reason, converse, adapt over multi-turn interactions, and maintain consistent behavior over time. My work aims to improve both the capabilities and safety of dialogue agents deployed in open-ended, real-world settings through multi-turn Reinforcement Learning.</p> 
+              
+              <p>Current research interests include:</p> 
+              <ul> 
+                <li><strong>Reinforcement Learning for Free-Form Interaction</strong>: Developing multi-turn RL methods that operate directly over naturalistic dialogue, enabling agents to maintain stable personas and exhibit cooperative, context-aware behavior without reliance on rigid task structures.</li> 
+                <li><strong>AI Safety</strong>: Evaluating and mitigating failure modes that emerge only in multi-turn conversation, including deceptive behavior, drift, and inconsistencies that undermine trust and reliability.</li> 
+                <li><strong>LLM Agents & Human Modeling</strong>: Improving the ability of LLMs to model human behavior and conversational dynamics, enabling more faithful user simulations for training agents and for studying grounded social interactions.</li> 
+              </ul>
 
-    <footer>
-        <p><a href="https://github.com/rm-rf-ryan">My GitHub</a></p>
-    </footer>
+              </p>
+              <p style="text-align:center">
+                <a href="mailto:ryancheng@berkeley.edu">Email</a> &nbsp/&nbsp
+                <a href="https://github.com/rm-rf-ryan">Github</a> &nbsp/&nbsp
+                <a href="https://x.com/rm_rf_ryan">Twitter</a> &nbsp/&nbsp
+                <a href="https://www.linkedin.com/in/ryanyicheng/">LinkedIn</a>
+
+              </p>
+            </td>
+            <td style="padding:2.5%;width:40%;max-width:40%">
+              <a href="images/RyanCheng.jpg"><img style="width:100%;max-width:100%;object-fit: cover; border-radius: 50%;" alt="profile photo" src="images/RyanCheng.jpg" class="hoverZoomLink"></a>
+            </td>
+          </tr>
+        </tbody></table>
+        <h2>Preprints</h2>
+
+          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+          <tr>
+            <td style="padding:20px;width:25%;vertical-align:middle">
+              <img src="images/consistency.png" alt="lmrl_gym" style="border-style: none" width="200">
+            </td>
+            <td style="padding:20px;width:75%;vertical-align:middle">
+              <papertitle>Consistently Simulating Human Personas with Multi-Turn Reinforcement Learning.</papertitle>
+              <br>
+              <a href="https://abdulhaim.github.io/" target="_blank">Marwa Abdulhai</a>,
+              <strong>Ryan Cheng</strong>,
+              <a href="https://www.linkedin.com/in/donovanclay" target="_blank">Donovan Clay</a>,
+              <a href="https://homes.cs.washington.edu/~althoff/" target="_blank">Tim Althoff</a>,
+              <a href="https://people.eecs.berkeley.edu/~svlevine/" target="_blank">Sergey Levine</a>,
+              <a href="https://natashajaques.ai/", target="_blank">Natasha Jaques</a>.
+              <br>
+              <em>NeurIPS 2025</em>
+              <br>
+              <a href="https://arxiv.org/abs/2511.00222" target="_blank">Paper</a> /
+              <a href="https://github.com/abdulhaim/consistent-LLMs" target="_blank">Code</a> /
+              <a href="https://sites.google.com/view/consistent-llms" target="_blank">Website</a>
+              <p>Large Language Models (LLMs) are increasingly used to simulate human users in interactive settings such as therapy, education, and social role-play. While these simulations enable scalable training and evaluation of AI agents, off-the-shelf LLMs often drift from their assigned personas, contradict earlier statements, or abandon role-appropriate behavior. We introduce a unified framework for evaluating and improving consistency in LLM-generated dialogue, reducing inconsistency by over 55%, resulting in more coherent, faithful, and trustworthy simulated users.</p>
+            </td>
+          </tr>
+        </tbody></table>
+
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+              <tr>
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <img src="images/motivation_rl_v3.png" alt="deception" style="border-style: none" width="200">
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <papertitle>Deception in Dialogue: Evaluating and Mitigating Deceptive Behavior in Large Language Models.</papertitle>
+                  <br>
+                  <a href="https://abdulhaim.github.io/" target="_blank">Marwa Abdulhai</a>,
+                  <strong>Ryan Cheng</strong>,
+                  <a href="https://www.linkedin.com/in/aryansh-s" target="_blank">Aryansh Shrivastava</a>,
+                  <a href="https://natashajaques.ai/", target="_blank">Natasha Jaques</a>,
+                  <a href="https://www.cs.ox.ac.uk/people/yarin.gal/website/", target="_blank">Yarin Gal</a>,
+                  <a href="https://people.eecs.berkeley.edu/~svlevine/", target="_blank">Sergey Levine</a>.
+                  <br>
+                  <em>In Review for ICLR 2026</em>
+                  <br>
+                  <a href="https://arxiv.org/pdf/2510.14318" target="_blank">Paper</a> /
+                  <a href="https://github.com/abdulhaim/deceptive_dialogue" target="_blank">Code</a> /
+                  <a href="https://sites.google.com/view/deceptive-dialogue" target="_blank">Website</a>
+                  <p>Large Language Models (LLMs) interact with hundreds of millions of people worldwide, powering applications such as customer support, education and healthcare. However, their ability to produce deceptive outputs, whether intentionally or inadvertently, poses significant safety concerns. 
+                  In this paper, we systematically investigate the extent to which LLMs engage in deception within dialogue. We benchmark 8 state-of-the-art models on 4 dialogue tasks, showing that LLMs naturally exhibit deceptive behavior in approximately 26% of dialogue turns, even when prompted with seemingly benign objectives Unexpectedly, models trained with RLHF, the predominant approach for ensuring the safety of widely-deployed LLMs, still exhibit deception at a rate of 43% on average. Given that deception in dialogue is a behavior that develops over an interaction history, its effective evaluation and mitigation necessitates moving beyond single-utterance analyses. We introduce a multi-turn reinforcement learning methodology to fine-tune LLMs to reduce deceptive behaviors, leading to a 77.6% reduction compared to other instruction-tuned models.
+
+                </p>
+                </td>
+              </tr>
+            </tbody></table>
+
+        <h2>Projects </h2>
+         <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+            <tr>
+              <td style="padding:20px;width:25%;vertical-align:middle">
+                <img src="images/flow_matching.png" alt="virtual personas" style="border-style: none" width="200">
+              </td>
+              <td style="padding:20px;width:75%;vertical-align:middle">
+                <papertitle>Action Conditioned Visual Prediction for Robotic Manipulation</papertitle>
+                <br>
+                <a href="https://www.linkedin.com/in/apai25/", target="_blank">Anirudh Pai</a>,
+                <strong>Ryan Cheng</strong>,
+                <a href="https://www.linkedin.com/in/jum-dev/", target="_blank">Junhua Ma</a>,
+                <br>
+                <em>CS 280 (Graduate Computer Vision) Final Project, Spring 2025</em>
+                <br>
+                <a href="data/Action_Conditioned_Visual_Prediction_for_Robotic_Manipulation.pdf" target="_blank">PDF</a>
+                <p>We investigate the task of action-conditioned visual prediction in robotic manipulation: given a sequence of past
+              RGB frames and associated low-level robot actions, can we
+              predict the robot’s future visual observations? This capability is crucial for model-based planning and sim-to-real
+              transfer, enabling agents to reason over future states without environment interaction. Using the large-scale DROID
+              dataset, we propose a generative flow matching model
+              model that predicts future frames from a wrist-mounted
+              camera viewpoint, conditioned on prior frames and jointlevel actions. To urge the model to learn actions—rather
+              than simply reproducing the last ground-truth frame in the
+              context horizon—we explore several training strategies and
+              evaluate their effectiveness through visual assessments of
+              stability during auto-regressive rollout. In particular, we
+              find that cascading UNets during training significantly improves inference-time stability. These findings highlight that
+              modeling action-conditioned dynamics in the visual domain
+              is feasible even in complex manipulation settings, paving
+              the way for its integration into planning pipelines.
+              </p>
+              </td>
+            </tr>
+          </tbody></table>
+          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+            <tr>
+              <td style="padding:20px;width:25%;vertical-align:middle">
+                <img src="images/mos2photo.png" alt="virtual personas" style="border-style: none" width="200">
+              </td>
+              <td style="padding:20px;width:75%;vertical-align:middle">
+                <papertitle>Lithium Intercalation Dynamics in Twisted Transition Metal Dichalcogenides (t-MoS₂)</papertitle>
+                <br>
+                <strong>Ryan Cheng</strong>,
+                <a href="https://www.ocf.berkeley.edu/~skahn/", target="_blank">Salman Kahn</a>,
+                <a href="https://physics.berkeley.edu/people/faculty/michael-crommie", target="_blank">Michael Crommie</a>,
+                <a href="https://physics.berkeley.edu/people/faculty/alex-zettl", target="_blank">Alex Zettl</a>.
+                <br>
+                <em>Poster at Berkeley Physics Undergraduate Research Symposium, Spring 2024</em>
+                <br>
+                <a href="data/Lithium_Intercalation_Dynamics_in_Twisted_MoS₂.pdf" target="_blank">PDF</a>
+                <p>Investigated the intercalation of lithium into twisted transition metal dichalcogenides using Raman Spectroscopy and Atomic Force Microscopy, with applications in energy storage and battery technology. We fabricate a t-MoS₂ device on a lithium-ion conducting glass ceramic (LICGC) and observe how lithium intercalates through a moiré lattice (generated by the twist between the MoS₂ layers) when a vertical electric field is applied.</p>
+              </td>
+            </tr>
+          </tbody></table>
+          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+            <tr>
+              <td style="padding:20px;width:25%;vertical-align:middle">
+                <img src="cs180/5/media/dog.png" alt="virtual personas" style="border-style: none" width="200">
+              </td>
+              <td style="padding:20px;width:75%;vertical-align:middle">
+                <papertitle>CS 280A (Computer Vision) Projects</papertitle>
+                <br>
+                <strong>Ryan Cheng</strong>
+                <br>
+                <em>Fall 2024</em>
+                <br>
+                <a href="./cs180/index.html" target="_blank">Link</a>
+                <p>Linked are the projects that I've done for CS 280A (Computer Vision) in Fall 2024. These include implementing my own diffusion and flow matching models, image warping and mosaicing through Homographies, Adaptive Non-Maximal Suppression, feature extraction and matching, and RANSAC, and Mixed Gradient Blending, Laplacian Blending, and Poisson Blending. </p>
+              </td>
+            </tr>
+          </tbody></table>
+  Website template adapted from <a href="https://jonbarron.info/">Jon Barron</a>.
 </body>
+
 </html>
