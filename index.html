@@ -44,31 +44,71 @@
             </td>
             <td style="padding:2.5%;width:40%;max-width:40%">
               <img style="width:100%;max-width:100%;object-fit: cover; border-radius: 50%; transition: transform 0.1s linear; cursor: pointer;" alt="profile photo" src="images/RyanCheng.jpg" class="hoverZoomLink" id="profilePhoto">
+              <div id="stats" style="text-align: center; font-size: 12px; margin-top: 10px; display: none;">
+              <div><strong>Position:</strong> <span id="position">0</span>°</div>
+              <div><strong>Velocity:</strong> <span id="velocity">0</span>°/frame</div>
+              <div><strong>Acceleration:</strong> <span id="acceleration">0</span>°/frame²</div> &nbsp;
+
+              <div><strong>Max Velocity:</strong> <span id="maxVelocity">0</span>°/frame</div>
+              <div><strong>Max Acceleration:</strong> <span id="maxAcceleration">0</span>°/frame²</div>
+              </div>
               <script>
               (function() {
               const img = document.getElementById('profilePhoto');
+              const statsDiv = document.getElementById('stats');
+              const posSpan = document.getElementById('position');
+              const velSpan = document.getElementById('velocity');
+              const accSpan = document.getElementById('acceleration');
+              const maxVelSpan = document.getElementById('maxVelocity');
+              const maxAccSpan = document.getElementById('maxAcceleration');
+              
               let rotation = 0;
               let velocity = 0;
+              let acceleration = 0;
+              let maxVelocity = 0;
+              let maxAcceleration = 0;
+
               let animationId = null;
 
               function animate() {
-              if (velocity > 0.1) {
-                rotation += velocity;
-                img.style.transform = `rotate(${rotation}deg)`;
-                velocity *= 0.98;
-                animationId = requestAnimationFrame(animate);
+              if (Math.abs(velocity) > 0.1 || Math.abs(acceleration) > 0.01) {
+              const deceleration = -velocity * 0.02;
+              velocity += acceleration;
+              rotation += velocity;
+              acceleration *= 0.95;
+              velocity *= 0.98;
+              
+              // Track maximums
+              if (Math.abs(velocity) > maxVelocity) {
+                maxVelocity = Math.abs(velocity);
+              }
+              if (Math.abs(acceleration) > maxAcceleration) {
+                maxAcceleration = Math.abs(acceleration);
+              }
+              
+              img.style.transform = `rotate(${rotation}deg)`;
+              statsDiv.style.display = 'block';
+              posSpan.textContent = (rotation % 360).toFixed(1);
+              velSpan.textContent = velocity.toFixed(2);
+              accSpan.textContent = (acceleration + deceleration).toFixed(2);
+              maxVelSpan.textContent = maxVelocity.toFixed(2);
+              maxAccSpan.textContent = maxAcceleration.toFixed(2);
+              
+              animationId = requestAnimationFrame(animate);
               } else {
-                velocity = 0;
-                animationId = null;
-                // img.style.transform = 'rotate(0deg)'; reset to vertical
-                // rotation = 0;
+              velocity = 0;
+              acceleration = 0;
+              posSpan.textContent = (rotation % 360).toFixed(1);
+              velSpan.textContent = velocity.toFixed(2);
+              accSpan.textContent = '0.00';
+              animationId = null;
               }
               }
 
               img.onclick = function() {
-              velocity += 5;
+              acceleration += 0.5;
               if (!animationId) {
-                animate();
+              animate();
               }
               };
               })();
