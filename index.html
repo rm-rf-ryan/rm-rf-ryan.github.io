@@ -21,7 +21,7 @@
                 <name>Ryan Cheng</name>
               </p>
 
-              <p>I am a 5th-year M.S. student in Computer Science at UC Berkeley in the <a href="https://bair.berkeley.edu/">Berkeley Artificial Intelligence Research (BAIR)</a> Lab, advised by <a href="https://people.eecs.berkeley.edu/~svlevine/">Sergey Levine</a>. I previously completed my B.A. in Computer Science and Physics, where I worked with Professors <a href="https://physics.berkeley.edu/people/faculty/michael-crommie">Michael Crommie</a> and <a href="https://physics.berkeley.edu/people/faculty/alex-zettl">Alex Zettl</a> in the Physics Department.</p> 
+              <p>I am a 5th-year M.S. student in Computer Science at UC Berkeley in the <a href="https://bair.berkeley.edu/">Berkeley Artificial Intelligence Research (BAIR)</a> Lab, advised by Professor <a href="https://people.eecs.berkeley.edu/~svlevine/">Sergey Levine</a>. I previously completed my B.A. in Computer Science and Physics, where I worked with Professors <a href="https://physics.berkeley.edu/people/faculty/michael-crommie">Michael Crommie</a> and <a href="https://physics.berkeley.edu/people/faculty/alex-zettl">Alex Zettl</a> in the Physics Department.</p> 
               
               <p>My research focuses on training LLMs to engage in reliable, coherent, and value-aligned free-form dialogue. I am particularly interested in advancing the foundations of LLM Agents—how they reason, converse, adapt over multi-turn interactions, and maintain consistent behavior over time. My work aims to improve both the capabilities and safety of dialogue agents deployed in open-ended, real-world settings through multi-turn Reinforcement Learning.</p> 
               
@@ -118,8 +118,67 @@
           </tr>
         </tbody></table>
         <h2>Preprints</h2>
+          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+              <tr>
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <a href="images/HAR_diagram.png"><img src="images/HAR_diagram.png" alt="deception" style="border-style: none" width="200"></a>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <papertitle>Hierarchical Agenda Reasoning for Strategic Multi-Turn Dialogue Agents. </papertitle>
+                  <br>
+                  <a href="https://abdulhaim.github.io/" target="_blank">Marwa Abdulhai</a>,
+                  <strong>Ryan Cheng</strong>,
+                  <a href="https://www.linkedin.com/in/aryansh-s" target="_blank">Aryansh Shrivastava</a>,
+                  <a href="https://aviralkumar2907.github.io/", target="_blank">Aviral Kumar</a>,
+                  <a href="https://people.eecs.berkeley.edu/~svlevine/", target="_blank">Sergey Levine</a>.
+                  <br>
+                  <a href="https://spoticlr.github.io/" target="_blank"><em>Scaling LLM Post-training (SPOT)</a> Workshop, ICLR 2026 </em><br>
+                  <a href="https://lifelongagent.github.io/" target="_blank"><em>Lifelong Learning Agents (LLA)</a> Workshop, ICLR 2026 </em><br>
+                  <a href="https://datafm.github.io/" target="_blank"><em>Data for Foundation Models (DATA-FM)</a> Workshop, ICLR 2026 </em><br>
+                  <em> In review at a ML Conference</em>
+                  <br>
+                  <a href="https://openreview.net/forum?id=p144zx4bO0" target="_blank">Paper</a>
+                  <!-- <a href="https://github.com/abdulhaim/deceptive_dialogue" target="_blank">Code</a> / -->
+                  <!-- <a href="https://sites.google.com/view/deceptive-dialogue" target="_blank">Website</a> -->
+                  <p>Large language models (LLMs) fine-tuned with reinforcement learning from human feedback (RLHF) are optimized for cooperative instruction following, which makes them poorly suited for strategic decision-making in long-horizon dialogue. To test the ability of LLMs to engage in strategic dialogue, we introduce StrategicBench, a benchmark of 30 negotiation tasks inspired by Harvard Program on Negotiation materials. Our benchmark reveals that while reasoning-oriented LLMs outperform instruction-tuned models, they fail to revise their strategy in response to opponent behavior. To address this limitation, we introduce Hierarchical Agenda Reasoning (HAR), a hierarchical reasoning framework that that explicitly separates what an agent seeks to achieve from how it acts in multi-turn dialogue. HAR structures generation around persistent goal representations that guide the selection and revision of tactics across turns, enabling agents to backtrack from failed strategies without abandoning larger objectives. We find that HAR outperforms instruction-tuned and prompting-based approaches, achieving higher agreement rates, better outcomes, and improved conversation quality in human evaluations. Lastly, multi-turn RL fine-tuning with HAR agents leads to generalization of negotiation performance across unseen tasks and opponent personalities.
+
+                </p>
+                </td>
+              </tr>
+            </tbody></table>
 
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+              <tr>
+                <td style="padding:20px;width:25%;vertical-align:middle">
+                  <a href="images/motivation_rl_v3.png"><img src="images/motivation_rl_v3.png" alt="deception" style="border-style: none" width="200"></a>
+                </td>
+                <td style="padding:20px;width:75%;vertical-align:middle">
+                  <papertitle>Evaluating & Reducing Deceptive Dialogue From Language Models with Multi-turn RL.</papertitle>
+                  <br>
+                  <a href="https://abdulhaim.github.io/" target="_blank">Marwa Abdulhai</a>,
+                  <strong>Ryan Cheng</strong>,
+                  <a href="https://www.linkedin.com/in/aryansh-s" target="_blank">Aryansh Shrivastava</a>,
+                  <a href="https://natashajaques.ai/", target="_blank">Natasha Jaques</a>,
+                  <a href="https://www.cs.ox.ac.uk/people/yarin.gal/website/", target="_blank">Yarin Gal</a>,
+                  <a href="https://people.eecs.berkeley.edu/~svlevine/", target="_blank">Sergey Levine</a>.
+                  <br>
+                  <a href="https://trustworthy-ai-workshop.github.io/iclr2026/" target="_blank"><em>Trustworthy AI</a> Workshop, ICLR 2026 </em><br>
+                  <em> In review at a ML Conference</em>
+                  <br>
+                  <a href="https://arxiv.org/absf/2510.14318" target="_blank">Paper</a> /
+                  <a href="https://github.com/abdulhaim/deceptive_dialogue" target="_blank">Code</a> /
+                  <a href="https://sites.google.com/view/deceptive-dialogue" target="_blank">Website</a>
+                  <p>Large Language Models (LLMs) interact with hundreds of millions of people worldwide, powering applications such as customer support, education and healthcare. However, their ability to produce deceptive outputs, whether intentionally or inadvertently, poses significant safety concerns. 
+                  In this paper, we systematically investigate the extent to which LLMs engage in deception within dialogue. We benchmark 8 state-of-the-art models on 4 dialogue tasks, showing that LLMs naturally exhibit deceptive behavior in approximately 26% of dialogue turns, even when prompted with seemingly benign objectives Unexpectedly, models trained with RLHF, the predominant approach for ensuring the safety of widely-deployed LLMs, still exhibit deception at a rate of 43% on average. Given that deception in dialogue is a behavior that develops over an interaction history, its effective evaluation and mitigation necessitates moving beyond single-utterance analyses. We introduce a multi-turn reinforcement learning methodology to fine-tune LLMs to reduce deceptive behaviors, leading to a 77.6% reduction compared to other instruction-tuned models.
+
+                </p>
+                </td>
+              </tr>
+            </tbody></table>
+
+        <h2> Publications </h2>
+
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
           <tr>
             <td style="padding:20px;width:25%;vertical-align:middle">
               <a href="images/consistency.png"><img src="images/consistency.png" alt="lmrl_gym" style="border-style: none" width="200"></a>
@@ -143,35 +202,6 @@
             </td>
           </tr>
         </tbody></table>
-
-        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
-              <tr>
-                <td style="padding:20px;width:25%;vertical-align:middle">
-                  <a href="images/motivation_rl_v3.png"><img src="images/motivation_rl_v3.png" alt="deception" style="border-style: none" width="200"></a>
-                </td>
-                <td style="padding:20px;width:75%;vertical-align:middle">
-                  <papertitle>Deception in Dialogue: Evaluating and Mitigating Deceptive Behavior in Large Language Models.</papertitle>
-                  <br>
-                  <a href="https://abdulhaim.github.io/" target="_blank">Marwa Abdulhai</a>,
-                  <strong>Ryan Cheng</strong>,
-                  <a href="https://www.linkedin.com/in/aryansh-s" target="_blank">Aryansh Shrivastava</a>,
-                  <a href="https://natashajaques.ai/", target="_blank">Natasha Jaques</a>,
-                  <a href="https://www.cs.ox.ac.uk/people/yarin.gal/website/", target="_blank">Yarin Gal</a>,
-                  <a href="https://people.eecs.berkeley.edu/~svlevine/", target="_blank">Sergey Levine</a>.
-                  <br>
-                  <em>In Review</em>
-                  <br>
-                  <a href="https://arxiv.org/pdf/2510.14318" target="_blank">Paper</a> /
-                  <a href="https://github.com/abdulhaim/deceptive_dialogue" target="_blank">Code</a> /
-                  <a href="https://sites.google.com/view/deceptive-dialogue" target="_blank">Website</a>
-                  <p>Large Language Models (LLMs) interact with hundreds of millions of people worldwide, powering applications such as customer support, education and healthcare. However, their ability to produce deceptive outputs, whether intentionally or inadvertently, poses significant safety concerns. 
-                  In this paper, we systematically investigate the extent to which LLMs engage in deception within dialogue. We benchmark 8 state-of-the-art models on 4 dialogue tasks, showing that LLMs naturally exhibit deceptive behavior in approximately 26% of dialogue turns, even when prompted with seemingly benign objectives Unexpectedly, models trained with RLHF, the predominant approach for ensuring the safety of widely-deployed LLMs, still exhibit deception at a rate of 43% on average. Given that deception in dialogue is a behavior that develops over an interaction history, its effective evaluation and mitigation necessitates moving beyond single-utterance analyses. We introduce a multi-turn reinforcement learning methodology to fine-tune LLMs to reduce deceptive behaviors, leading to a 77.6% reduction compared to other instruction-tuned models.
-
-                </p>
-                </td>
-              </tr>
-            </tbody></table>
-
         <h2>Projects </h2>
          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <tr>
